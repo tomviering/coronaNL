@@ -1,4 +1,5 @@
 function myzones = getzones(countryname)
+% get the zones for a country
 
 thetable = readtable('time_series_19-covid-Confirmed.csv','HeaderLines',1);
 countries = thetable(:,2);
