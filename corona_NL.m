@@ -1,23 +1,15 @@
 clear all;
 clc;
 
-countries = getcountries('time_series_19-covid-Confirmed.csv',1,10000);
-
-NL = 99;
-countries(99,:)
-
-Italy = 58;
-
-data = getdata();
-
-dataNL = data(99-1,:);
-dataNL = table2array(dataNL);
-dataNL = dataNL(40:end);
-y = dataNL;
+y = getdata2('Netherlands');
+y = y(40:end); % only march
 
 the_markersize = 20;
 the_linewidth = 5;
 
+y(12) = 614; % just copied from RIVM website
+%y(11) = 503;
+%y(10) = 382;
 %y(9) = 321; % 09-03
 %y(8) = 265; % 08-03
 %y(7) = 188; % 07-03
@@ -40,6 +32,9 @@ y2 = y;
 y2(isnan(y2)) = [];
 t2 = t;
 t2(isnan(y)) = [];
+
+y2 = y2(5:end);
+t2 = t2(5:end);
 
 X = [t2',ones(size(t2'))];
 Y = log10(y2');
@@ -113,8 +108,6 @@ fprintf('every %.1f days the amount of infections grows by a factor 2\n',log(2)/
 
 grid on
 
-legend([l_dots,l_pred],'#cases according to RIVM',sprintf('Fit y=%.1f\\cdot%.1f^t',the_factor,the_exponent),'Location','SouthEast')
-
 title('Corona in Netherlands')
 
 %semilogy(tfar(:,1),the_function) gives the same trendline
@@ -123,3 +116,9 @@ title('Corona in Netherlands')
 %grid minor
 
 %export_fig('corona_NL','-pdf','-transparent')
+
+y_italy = getdata2('Italy');
+
+l_italy = semilogy(y_italy(28:end),'.','DisplayName','Italy','MarkerSize',the_markersize);
+
+legend([l_dots,l_pred,l_italy],'#cases according to RIVM',sprintf('Fit y=%.1f\\cdot%.1f^t',the_factor,the_exponent),'Italy (12 days earlier)','Location','SouthEast')
