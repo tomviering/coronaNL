@@ -15,7 +15,9 @@ websave(fn, url);
 %% Get the zones
 
 country = 'Netherlands'; % country for which we want to fit
-zones = getzones('Netherlands'); % what zones are there?
+fprintf('For the country %s the following zones are available:\n', country);
+zones = getzones('Netherlands') % what zones are there?
+% put the zone you want to fit in 'zone' below
 
 %% Get the data
 
@@ -26,7 +28,7 @@ offset = 40; % start plots from march 1
 y = y(offset:end); % only march
 t = 1:length(y); % time in days from March
 
-%% Make figure with data from NL
+%% Make figure with data
 
 figure;
 plot(t,y,'.','MarkerSize',markersize,'DisplayName',country);
@@ -40,32 +42,38 @@ legend('Location','NorthWest');
 %% Compute exponential fit using least squares
 
 skip = 5; % do not fit first 5 days
-mylim = 20; % until when to predict
+maxt = 20; % until when to predict
 
 t = t(skip:end);
 y = y(skip:end);
 
-X = [t',ones(size(t'))];
-Y = log10(y');
+X = [t',ones(size(t'))]; % the input variable (time, offset)
+Y = log10(y'); % convert to logscale and do fit there
 
-beta = inv(X'*X)*X'*Y;
+beta = inv(X'*X)*X'*Y; % least square fit
 
-tfar = [(1:mylim)',ones(mylim,1)];
-ypred = tfar*beta;
-ypred2 = 10.^ypred;
+tfar = [(1:maxt)',ones(maxt,1)]; % what dates to predict
+ypred_logscale = tfar*beta; % compute predictions in logscale
+ypred = 10.^ypred_logscale; % convert back to normal scale
 
-plot(1:mylim,ypred2,':','DisplayName',sprintf('%s Fit',country),'LineWidth',linewidth);
+plot(1:maxt,ypred,':','DisplayName',sprintf('%s Fit',country),'LineWidth',linewidth);
 legend('Location','NorthWest');
 
-%% Compute growth factors
+%% Compute growth factors and display fit information
 
-the_exponent = 10.^beta(1);
-the_factor = 10.^beta(2);
-the_function = the_exponent.^tfar(:,1) * 10.^beta(2);
+A = 10.^beta(1);
+C = 10.^beta(2);
+the_function = A.^tfar(:,1) * C; % recompute predictions
+% observe that ypred = the_function, thus the formula is indeed correct
 
 double_time = 1/beta(1);
-fprintf('every %.1f days the amount of infections grows by a factor 10\n',log(10)/log(the_exponent))
-fprintf('every %.1f days the amount of infections grows by a factor 2\n',log(2)/log(the_exponent))
+clc;
+fprintf('y = C A^t\n');
+fprintf('where t is the day in March\n');
+fprintf('A = %g\n',A);
+fprintf('C = %g\n',C);
+fprintf('every %.1f days the amount of infections grows by a factor 10\n',log(10)/log(A))
+fprintf('every %.1f days the amount of infections grows by a factor 2\n',log(2)/log(A))
 
 %% Compare with Italy
 
