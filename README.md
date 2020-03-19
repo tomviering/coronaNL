@@ -1,5 +1,7 @@
 # Exponential Fit for Corona Cases 
 
+![example of fit for the Netherlands](https://github.com/tomviering/coronaNL/raw/master/fit.png)
+
 Downloads the latest Corona data from Johns Hopkins University and performs an exponential fit for any country.
 It also makes a comparison with Italy. 
 
