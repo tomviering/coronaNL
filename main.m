@@ -12,6 +12,11 @@ url = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_cov
 fn = 'time_series_19-covid-Confirmed.csv';
 websave(fn, url);
 
+%% List all available countries
+
+countries = getcountries();
+countries
+
 %% Get the zones
 
 country = 'Netherlands'; % country for which we want to fit
