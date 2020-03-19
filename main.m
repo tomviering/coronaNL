@@ -62,7 +62,17 @@ tfar = [(1:maxt)',ones(maxt,1)]; % what dates to predict
 ypred_logscale = tfar*beta; % compute predictions in logscale
 ypred = 10.^ypred_logscale; % convert back to normal scale
 
-plot(1:maxt,ypred,':','DisplayName',sprintf('%s Fit',country),'LineWidth',linewidth);
+%% Figure with least squares fit
+
+figure;
+hold on;
+plot(1:maxt,ypred,'DisplayName','Least Squares Fit','LineWidth',linewidth);
+plot(t,y,'.','MarkerSize',markersize,'DisplayName',country);
+
+grid on
+title(sprintf('Corona in %s',country))
+xlabel('March')
+ylabel('Positive Test Results')
 legend('Location','NorthWest');
 
 %% Compute growth factors and display fit information
@@ -72,14 +82,44 @@ C = 10.^beta(2);
 the_function = A.^tfar(:,1) * C; % recompute predictions
 % observe that ypred = the_function, thus the formula is indeed correct
 
-double_time = 1/beta(1);
+%% Robust fit using previous one as initialization
+
+x = t;
+ft = fittype( 'A * C^x', 'independent', 'x', 'dependent', 'y' );
+opts = fitoptions( 'Method', 'NonlinearLeastSquares' );
+opts.Display = 'iter';
+opts.Algorithm = 'Levenberg-Marquardt';
+%opts.Robust = 'LAR';
+
+opts.StartPoint = [C A];
+% Fit model to data.
+[fitresult, gof] = fit(x', y', ft, opts);
+
+%% Plot robust fit
+
+figure;
+hold on;
+plot(tfar(:,1),feval(fitresult,tfar(:,1)),'DisplayName','Robust fit','LineWidth',linewidth);
+plot(t,y,'.','MarkerSize',markersize,'DisplayName',country);
+
+grid on
+title(sprintf('Corona in %s',country))
+xlabel('March')
+ylabel('Positive Test Results')
+legend('Location','NorthWest');
+
+%% Get growth factors
+
+A = fitresult.A;
+C = fitresult.C;
+
 clc;
-fprintf('y = C A^t\n');
+fprintf('y = A C^t\n');
 fprintf('where t is the day in March\n');
 fprintf('A = %g\n',A);
 fprintf('C = %g\n',C);
-fprintf('every %.1f days the amount of infections grows by a factor 10\n',log(10)/log(A))
-fprintf('every %.1f days the amount of infections grows by a factor 2\n',log(2)/log(A))
+fprintf('every %.1f days the amount of infections grows by a factor 10\n',log(10)/log(C))
+fprintf('every %.1f days the amount of infections grows by a factor 2\n',log(2)/log(C))
 
 %% Compare with Italy
 
@@ -91,6 +131,14 @@ until_date = 40-timeshift+max(t); % plot until current date
 
 y_italy_plot = y_italy((offset-timeshift):until_date);
 
+figure;
+hold on;
+plot(tfar(:,1),feval(fitresult,tfar(:,1)),'DisplayName','Robust fit','LineWidth',linewidth)
+plot(t,y,'.','MarkerSize',markersize,'DisplayName',country);
 plot(y_italy_plot,'.','MarkerSize',markersize,'DisplayName',sprintf('Italy %d days earlier',timeshift));
 
+grid on
+title(sprintf('Corona in %s',country))
+xlabel('March')
+ylabel('Positive Test Results')
 legend('Location','NorthWest');
