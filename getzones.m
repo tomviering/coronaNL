@@ -1,4 +1,4 @@
-function y = getdata2(countryname, zonename)
+function myzones = getzones(countryname)
 
 thetable = readtable('time_series_19-covid-Confirmed.csv','HeaderLines',1);
 countries = thetable(:,2);
@@ -9,14 +9,9 @@ myzones = {};
 for i = 1:length(countriecell)
     country = countriecell{i};
     zone = zonecell{i};
-    if strcmp(string(country),countryname) && strcmp(string(zone),zonename)
-        NL = i;
+    if strcmp(string(country),countryname)
+        myzones{end+1} = zone;
     end
 end
 
-%%
-
-dataNL = thetable(NL,5:end);
-dataNL = table2array(dataNL);
-dataNL = dataNL(1:end); % only get march
-y = dataNL;
+end

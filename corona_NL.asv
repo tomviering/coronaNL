@@ -2,10 +2,10 @@ clear all;
 close all;
 clc;
 
-the_markersize = 20;
-the_linewidth = 3;
-
 zones = getzones('Netherlands');
+
+the_markersize =
+
 y = getdata2('Netherlands', 'Netherlands');
 y = y(40:end); % only march
 
@@ -28,9 +28,9 @@ ypred = tfar*beta;
 ypred2 = 10.^ypred;
 
 hold on;
-plot(1:mylim,ypred2,':','DisplayName','Netherlands Fit');
+l_pred = plot(1:mylim,ypred2,':');
 
-plot(t,y,'.','MarkerSize',the_markersize,'DisplayName','Netherlands');
+l_dots = plot(t,y,'.','MarkerSize',the_markersize);
 
 numbers = get(gca,'XTick');
 
@@ -69,7 +69,7 @@ grid on
 title('Corona in Netherlands')
 
 y_italy = getdata2('Italy','');
-timeshift = 12;
-plot(y_italy((40-12):45),'.','DisplayName','Italy','MarkerSize',the_markersize,'DisplayName',sprintf('Italy %d days earlier',timeshift));
 
-legend();
+l_italy = plot(y_italy(28:45),'.','DisplayName','Italy','MarkerSize',the_markersize);
+
+legend([l_dots,l_pred,l_italy],'#gevallen in NL',sprintf('Fit y=%.1f\\cdot%.1f^t',the_factor,the_exponent),'Italie (12 dagen eerder)','Location','SouthEast')
