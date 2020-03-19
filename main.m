@@ -37,6 +37,7 @@ hold on;
 grid on
 title(sprintf('Corona in %s',country))
 xlabel('March')
+ylabel('Positive Test Results')
 legend('Location','NorthWest');
 
 %% Compute exponential fit using least squares
